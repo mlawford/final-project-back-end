@@ -3,7 +3,8 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-var Comment = require('./models/comments');
+var User = require('./models/Users');
+var CodeChallenge = require('./models/CodeChallenges');
 
 //and create our instances
 var app = express();
@@ -26,7 +27,7 @@ app.use(function(req, res, next) {
  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
 
-//and remove cacheing so we get the most recent comments
+//and remove cacheing so we get the most recent users
  res.setHeader('Cache-Control', 'no-cache');
  next();
 });
@@ -36,33 +37,63 @@ router.get('/', function(req, res) {
  res.json({ message: 'API Initialized!'});
 });
 
-//adding the /comments route to our /api router
-router.route('/comments')
+//adding the /users route to our /api router
+router.route('/challenges')
+//retrieve all users from the database
+.get(function(req, res) {
 
- //retrieve all comments from the database
+//looks at our User Schema
+CodeChallenge.find(function(err, codeChallenges) {
+if (err)
+res.send(err);
+
+//responds with a json object of our database users.
+res.json(codeChallenges)
+});
+})
+
+.post(function(req, res) {
+var codeChallenge = new CodeChallenge();
+
+//body parser lets us use the req.body
+codeChallenge.title = req.body.title;
+codeChallenge.difficulty = req.body.difficulty;
+codeChallenge.description = req.body.description;
+codeChallenge.content = req.body.content;
+codeChallenge.answer = req.body.answer;
+codeChallenge.save(function(err) {
+if (err)
+res.send(err);
+res.json({ message: 'Challenge successfully added!' });
+});
+});
+
+router.route('/users')
+
+
+ //retrieve all users from the database
  .get(function(req, res) {
 
- //looks at our Comment Schema
- Comment.find(function(err, comments) {
+ //looks at our User Schema
+ User.find(function(err, users) {
  if (err)
  res.send(err);
 
- //responds with a json object of our database comments.
- res.json(comments)
+ //responds with a json object of our database users.
+ res.json(users)
  });
  })
 
- //post new comment to the database
+ //post new user to the database
  .post(function(req, res) {
- var comment = new Comment();
+ var user = new User();
 
  //body parser lets us use the req.body
- comment.author = req.body.author;
- comment.text = req.body.text;
-comment.save(function(err) {
+ user.name = req.body.name;
+user.save(function(err) {
  if (err)
  res.send(err);
- res.json({ message: 'Comment successfully added!' });
+ res.json({ message: 'User successfully added!' });
  });
  });
 

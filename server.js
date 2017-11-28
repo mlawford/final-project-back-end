@@ -16,29 +16,6 @@ wss.on('connection', (ws, req) => {
   console.log(`${ip} just made a WS connection`);
 
   allConnections.push(ws)
-  // allConnections.forEach(currConn => {
-  //   if (currConn === ws) {
-  //   currConn.send(lastMessage)
-  // }
-  // })
-
-    // for(i=0; i < lobbies.length; i++){
-    //
-    //   if (lobbies[i].length < 2 ){
-    //     lobbies[i].push(ws)
-    //     console.log(lobbies)
-    //     break
-    //   } else if (lobbies[i+1].length < 2){
-    //     lobbies[i+1].push(ws)
-    //     console.log(lobbies)
-    //     break
-    //   } else {
-    //     lobbies.push([ws])
-    //   }
-    // }
-
-
-
   if (lobbies[0].length < 2){
     lobbies[0].push(ws)
     console.log("lobby 1")
@@ -53,9 +30,6 @@ wss.on('connection', (ws, req) => {
     console.log("lobbies are full")
   }
 
-
-
-
   ws.on('close', function close(){
     let index = allConnections.indexOf(ws)
     if (index > -1) {
@@ -68,7 +42,6 @@ wss.on('connection', (ws, req) => {
       }
     })
   })
-
 
   ws.on('message', (payload) => {
     console.log(payload);
@@ -83,12 +56,6 @@ wss.on('connection', (ws, req) => {
         })
       }
     })
-
-    // allConnections.forEach(currConn => {
-    //   if (currConn !== ws) {
-    //     currConn.send(`${payload}`)
-    //   }
-    // })
   })
 })
 
