@@ -5,9 +5,13 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var User = require('./models/Users');
 var CodeChallenge = require('./models/CodeChallenges');
+var Lobby = require('./models/Lobbies');
 
 //and create our instances
 var app = express();
+mongoose.connect('mongodb://poop:poop@ds113826.mlab.com:13826/final-project-db');
+
+// needs to be in other file
 var router = express.Router();
 
 //set our port to either a predetermined port number if you have set
@@ -32,6 +36,26 @@ app.use(function(req, res, next) {
  next();
 });
 
+app.put('/lobbies/:lobby_id', function(req, res) {
+  console.log("Hitting lobbies")
+  Lobby.findById(req.params.lobby_id, function(err, lobby) {
+    if (err) {
+      res.send(err);
+    }
+    (req.body.title) ? lobby.title = req.body.title : null;
+    if (req.body.participants) {
+      lobby.participants = req.body.participants
+    }
+
+    lobby.save(function(err) {
+      if (err) {
+        res.send(err);
+      }
+      res.json({ message: 'Lobby has been updated' });
+    });
+  });
+})
+
 //now we can set the route path & initialize the API
 router.get('/', function(req, res) {
  res.json({ message: 'API Initialized!'});
@@ -40,33 +64,60 @@ router.get('/', function(req, res) {
 //adding the /users route to our /api router
 router.route('/challenges')
 //retrieve all users from the database
-.get(function(req, res) {
+  .get(function(req, res) {
 
-//looks at our User Schema
-CodeChallenge.find(function(err, codeChallenges) {
-if (err)
-res.send(err);
+  //looks at our User Schema
+  CodeChallenge.find(function(err, codeChallenges) {
+  if (err)
+    res.send(err);
 
-//responds with a json object of our database users.
-res.json(codeChallenges)
-});
+  //responds with a json object of our database users.
+    res.json(codeChallenges)
+  });
 })
 
 .post(function(req, res) {
-var codeChallenge = new CodeChallenge();
+  var codeChallenge = new CodeChallenge();
 
 //body parser lets us use the req.body
-codeChallenge.title = req.body.title;
-codeChallenge.difficulty = req.body.difficulty;
-codeChallenge.description = req.body.description;
-codeChallenge.content = req.body.content;
-codeChallenge.answer = req.body.answer;
-codeChallenge.save(function(err) {
+  codeChallenge.sample = req.body.sample;
+  codeChallenge.content = req.body.content;
+  codeChallenge.answer = req.body.answer;
+  codeChallenge.difficulty = req.body.difficulty
+  codeChallenge.save(function(err) {
+  if (err)
+  res.send(err);
+  res.json({ message: 'Challenge successfully added!' });
+  });
+});
+
+  router.route('/lobbies')
+//retrieve all users from the database
+.get(function(req, res) {
+
+//looks at our User Schema
+  Lobby.find(function(err, lobby) {
+  if (err)
+  res.send(err);
+
+  //responds with a json object of our database users.
+  res.json(lobby)
+  });
+})
+
+.post(function(req, res) {
+var lobby = new Lobby();
+
+//body parser lets us use the req.body
+lobby.title = req.body.title;
+lobby.participants = req.body.participants;
+lobby.save(function(err) {
 if (err)
 res.send(err);
-res.json({ message: 'Challenge successfully added!' });
+res.json({ message: 'Lobby Added' });
 });
 });
+
 
 router.route('/users')
 
@@ -90,12 +141,15 @@ router.route('/users')
 
  //body parser lets us use the req.body
  user.name = req.body.name;
+ user.completedChallenges = req.body.completedChallenges;
 user.save(function(err) {
  if (err)
  res.send(err);
  res.json({ message: 'User successfully added!' });
  });
  });
+
+
 
 
 //Use our router configuration when we call /api
@@ -107,4 +161,3 @@ app.listen(port, function() {
 });
 
 //db config
-mongoose.connect('mongodb://poop:poop@ds113826.mlab.com:13826/final-project-db');

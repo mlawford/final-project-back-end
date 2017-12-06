@@ -6,10 +6,9 @@ var Schema = mongoose.Schema;
 //create new instance of the mongoose.schema. the schema takes an
 //object that shows the shape of your database entries.
 var CodeChallengesSchema = new Schema({
- title: String,
- difficulty: Number,
- description: String,
+ difficulty: String,
  content: String,
+ sample: String,
  answer: String,
 });
 

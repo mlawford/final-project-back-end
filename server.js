@@ -1,15 +1,12 @@
 var WebSocketServer = require('ws').Server
 const express = require('express');
-
+const uuidv4 = require('uuid/v4');
 const app = express();
-
 const PORT = 8080
-
 var wss = new WebSocketServer({port: PORT})
 
 let allConnections = []
 let lobbies = [ [], [], [] ]
-let lastMessage = ""
 
 wss.on('connection', (ws, req) => {
   const ip = req.connection.remoteAddress
@@ -44,9 +41,7 @@ wss.on('connection', (ws, req) => {
   })
 
   ws.on('message', (payload) => {
-    console.log(payload);
     // lastMessage = payload
-
     lobbies.forEach(lobby => {
       if (lobby.includes(ws)){
         lobby.forEach(socket => {
