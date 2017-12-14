@@ -1,5 +1,5 @@
 'use strict'
-//first we import our dependencies…
+//import dependencies
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
@@ -7,31 +7,26 @@ var User = require('./models/Users');
 var CodeChallenge = require('./models/CodeChallenges');
 var Lobby = require('./models/Lobbies');
 
-//and create our instances
+//create instances
 var app = express();
 mongoose.connect('mongodb://poop:poop@ds113826.mlab.com:13826/final-project-db');
-
-// needs to be in other file
 var router = express.Router();
 
-//set our port to either a predetermined port number if you have set
-//it up, or 3001
+//set port
 var port = process.env.API_PORT || 3001;
 
-//now we should configure the API to use bodyParser and look for
-//JSON data in the request body
+//bodyParser and look for JSON data in the request body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-//To prevent errors from Cross Origin Resource Sharing, we will set
-//our headers to allow CORS with middleware like so:
+//CORS
 app.use(function(req, res, next) {
  res.setHeader('Access-Control-Allow-Origin', '*');
  res.setHeader('Access-Control-Allow-Credentials', 'true');
  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
 
-//and remove cacheing so we get the most recent users
+//remove cacheing
  res.setHeader('Cache-Control', 'no-cache');
  next();
 });
@@ -56,108 +51,66 @@ app.put('/lobbies/:lobby_id', function(req, res) {
   });
 })
 
-//now we can set the route path & initialize the API
+//set root path
 router.get('/', function(req, res) {
  res.json({ message: 'API Initialized!'});
 });
 
-//adding the /users route to our /api router
+//add challenges route
 router.route('/challenges')
-//retrieve all users from the database
-  .get(function(req, res) {
 
-  //looks at our User Schema
+//retrieve all challenges from the database
+.get(function(req, res) {
   CodeChallenge.find(function(err, codeChallenges) {
-  if (err)
+    if (err)
     res.send(err);
-
-  //responds with a json object of our database users.
     res.json(codeChallenges)
   });
 })
 
+//post challenge to database
 .post(function(req, res) {
   var codeChallenge = new CodeChallenge();
-
-//body parser lets us use the req.body
   codeChallenge.sample = req.body.sample;
   codeChallenge.content = req.body.content;
   codeChallenge.answer = req.body.answer;
   codeChallenge.difficulty = req.body.difficulty
   codeChallenge.save(function(err) {
   if (err)
-  res.send(err);
-  res.json({ message: 'Challenge successfully added!' });
+    res.send(err);
+    res.json({ message: 'Challenge successfully added!' });
   });
 });
 
-  router.route('/lobbies')
-//retrieve all users from the database
-.get(function(req, res) {
-
-//looks at our User Schema
-  Lobby.find(function(err, lobby) {
-  if (err)
-  res.send(err);
-
-  //responds with a json object of our database users.
-  res.json(lobby)
-  });
-})
-
-.post(function(req, res) {
-var lobby = new Lobby();
-
-//body parser lets us use the req.body
-lobby.title = req.body.title;
-lobby.participants = req.body.participants;
-lobby.save(function(err) {
-if (err)
-res.send(err);
-res.json({ message: 'Lobby Added' });
-});
-});
-
-
+//add users route
 router.route('/users')
 
-
- //retrieve all users from the database
- .get(function(req, res) {
-
+//retrieve all users from the database
+.get(function(req, res) {
  //looks at our User Schema
  User.find(function(err, users) {
- if (err)
- res.send(err);
-
- //responds with a json object of our database users.
- res.json(users)
- });
+   if (err)
+     res.send(err);
+     res.json(users)
+   });
  })
 
  //post new user to the database
  .post(function(req, res) {
- var user = new User();
-
- //body parser lets us use the req.body
- user.name = req.body.name;
- user.completedChallenges = req.body.completedChallenges;
-user.save(function(err) {
- if (err)
- res.send(err);
- res.json({ message: 'User successfully added!' });
- });
+   var user = new User();
+   user.name = req.body.name;
+   user.completedChallenges = req.body.completedChallenges;
+   user.save(function(err) {
+     if (err)
+       res.send(err);
+       res.json({ message: 'User successfully added!' });
+   });
  });
 
-
-
-
-//Use our router configuration when we call /api
+//Use router config when call /api
 app.use('/api', router);
 
-//starts the server and listens for requests
+//start server and listen for requests
 app.listen(port, function() {
  console.log(`api running on port ${port}`);
 });
-
-//db config
