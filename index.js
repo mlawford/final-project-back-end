@@ -1,4 +1,6 @@
 'use strict'
+
+console.log('poop');
 //import dependencies
 var express = require('express');
 var mongoose = require('mongoose');
