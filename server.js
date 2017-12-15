@@ -2,7 +2,8 @@ var WebSocketServer = require('ws').Server
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 const app = express();
-var wss = new WebSocketServer({port: process.env.port})
+const PORT = process.env.PORT || 8080
+var wss = new WebSocketServer({port: PORT})
 
 let allConnections = []
 let lobbies = [ [], [], [] ]
@@ -53,4 +54,4 @@ wss.on('connection', (ws, req) => {
   })
 })
 
-console.log("LISTENING FOR WS CONNECTIONS ON PORT: ", 5000);
+console.log("LISTENING FOR WS CONNECTIONS ON PORT: ", PORT);
