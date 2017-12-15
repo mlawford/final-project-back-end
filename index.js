@@ -13,7 +13,7 @@ mongoose.connect('mongodb://poop:poop@ds113826.mlab.com:13826/final-project-db')
 var router = express.Router();
 
 //set port
-var port = process.env.API_PORT || 3001;
+var port = process.env.port || 3001;
 
 //bodyParser and look for JSON data in the request body
 app.use(bodyParser.urlencoded({ extended: true }));
