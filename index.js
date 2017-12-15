@@ -9,6 +9,8 @@ var User = require('./models/Users');
 var CodeChallenge = require('./models/CodeChallenges');
 var Lobby = require('./models/Lobbies');
 
+require('./server.js')
+
 //create instances
 var app = express();
 mongoose.connect('mongodb://poop:poop@ds113826.mlab.com:13826/final-project-db');
